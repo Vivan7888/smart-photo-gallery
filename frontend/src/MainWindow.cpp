@@ -180,8 +180,14 @@ int MainWindow::selectedPhotoId() const {
 }
 
 void MainWindow::importPhotos() {
-    const QStringList paths = QFileDialog::getOpenFileNames(
-        this, "Choose photos", QString(), "Images (*.png *.jpg *.jpeg *.bmp *.gif *.webp)");
+    // Use Qt's own picker instead of the macOS native picker. This prevents the
+    // native dialog from appearing behind the application on some systems.
+    QFileDialog picker(this, "Choose photos");
+    picker.setFileMode(QFileDialog::ExistingFiles);
+    picker.setNameFilter("Images (*.png *.jpg *.jpeg *.bmp *.gif *.webp *.heic *.HEIC);;All files (*)");
+    picker.setOption(QFileDialog::DontUseNativeDialog, true);
+    if (picker.exec() != QDialog::Accepted) return;
+    const QStringList paths = picker.selectedFiles();
     if (paths.isEmpty()) return;
 
     int imported = 0;
