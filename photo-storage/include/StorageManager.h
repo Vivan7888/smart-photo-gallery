@@ -14,7 +14,7 @@ public:
     explicit StorageManager(PhotoRepository &repository);
 
     bool isOlderThanOneYear(const PhotoRecord &record) const;
-    bool archivePhoto(PhotoRecord &record, QString *error = nullptr);
+    bool archivePhoto(PhotoRecord &record, bool manualOverride, QString *error = nullptr);
     bool restorePhoto(PhotoRecord &record, QString *error = nullptr);
     QString previewPath(const PhotoRecord &record, bool *isTemporary, QString *error = nullptr) const;
     bool deleteStoredFile(const PhotoRecord &record, QString *error = nullptr) const;

@@ -23,13 +23,13 @@ bool StorageManager::isOlderThanOneYear(const PhotoRecord &record) const {
     return addedDate.isValid() && addedDate <= QDate::currentDate().addYears(-1);
 }
 
-bool StorageManager::archivePhoto(PhotoRecord &record, QString *error) {
+bool StorageManager::archivePhoto(PhotoRecord &record, bool manualOverride, QString *error) {
     if (record.archived) {
         if (error) *error = "This photo is already archived.";
         return false;
     }
-    if (!isOlderThanOneYear(record)) {
-        if (error) *error = "Only photos at least one year old can be archived.";
+    if (!manualOverride && !isOlderThanOneYear(record)) {
+        if (error) *error = "Only photos at least one year old can be archived automatically.";
         return false;
     }
 
