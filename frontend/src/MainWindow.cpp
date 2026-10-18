@@ -252,7 +252,7 @@ void MainWindow::archiveSelectedPhoto() {
         return;
     }
     QString error;
-    if (!m_storageManager.archivePhoto(*record, &error)) {
+    if (!m_storageManager.archivePhoto(*record,true, &error)) {
         QMessageBox::information(this, "Photo not archived", error);
         return;
     }
@@ -268,7 +268,7 @@ void MainWindow::archiveOlderPhotos() {
         if (!record->archived && m_storageManager.isOlderThanOneYear(*record)) {
             ++eligible;
             QString error;
-            if (m_storageManager.archivePhoto(*record, &error)) {
+            if (m_storageManager.archivePhoto(*record,false, &error)) {
                 action_stack_push(&m_actions, record->id, ACTION_ARCHIVE);
                 ++archived;
             }
