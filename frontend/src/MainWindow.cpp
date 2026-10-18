@@ -86,7 +86,7 @@ void MainWindow::buildUi() {
 
     auto *controls = new QHBoxLayout;
     auto *addButton = new QPushButton("Add Photos", central);
-    auto *archiveButton = new QPushButton("Archive Selected", central);
+    auto *archiveButton = new QPushButton("Archive Selected(Any Age)", central);
     auto *archiveOlderButton = new QPushButton("Archive Old Photos", central);
     auto *previewButton = new QPushButton("Preview", central);
     auto *undoButton = new QPushButton("Undo Archive", central);
