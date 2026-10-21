@@ -53,7 +53,10 @@ bool StorageManager::archivePhoto(PhotoRecord &record, bool manualOverride, QStr
         return false;
     }
 
-    QDir().mkpath(archiveDirectory());
+        if (!QDir().mkpath(archiveDirectory())) {
+        if (error) *error = "Could not create the archive directory.";
+        return false;
+    }
     const QString archivePath = QDir(archiveDirectory()).filePath(QString::number(record.id) + ".spg");
     QSaveFile archiveFile(archivePath);
     if (!archiveFile.open(QIODevice::WriteOnly) || archiveFile.write(compressedBytes) != compressedBytes.size() || !archiveFile.commit()) {
