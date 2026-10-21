@@ -13,10 +13,12 @@
 
 PhotoRepository::PhotoRepository(const QString &storageRoot) : m_storageRoot(storageRoot) {
     photo_list_init(&m_list);
+    album_tree_init(&m_albumTree, "All Photos");
     QDir().mkpath(activeDirectory());
 }
 
-PhotoRepository::~PhotoRepository() { photo_list_clear(&m_list); }
+PhotoRepository::~PhotoRepository() { album_tree_clear(&m_albumTree);
+    photo_list_clear(&m_list); }
 
 void PhotoRepository::copyText(char *destination, int length, const QString &value) {
     const QByteArray bytes = value.toUtf8();
@@ -25,8 +27,10 @@ void PhotoRepository::copyText(char *destination, int length, const QString &val
 }
 
 bool PhotoRepository::load(QString *error) {
-    photo_list_clear(&m_list);
-    QFile file(metadataPath());
+photo_list_clear(&m_list);
+album_tree_clear(&m_albumTree);
+album_tree_init(&m_albumTree, “All Photos”);
+QFile file(metadataPath());
     if (!file.exists()) return true;
     if (!file.open(QIODevice::ReadOnly)) {
         if (error) *error = "Cannot open metadata file.";
@@ -52,7 +56,15 @@ bool PhotoRepository::load(QString *error) {
         record.original_size = object.value("originalSize").toVariant().toLongLong();
         record.stored_size = object.value("storedSize").toVariant().toLongLong();
         record.archived = object.value("archived").toBool() ? 1 : 0;
-        photo_list_add(&m_list, &record);
+        PhotoRecord *addedRecord = photo_list_add(&m_list, &record);
+
+if (addedRecord != nullptr) {
+album_tree_add_photo(
+&m_albumTree,
+addedRecord->album_name,
+addedRecord->id
+);
+
     }
     return true;
 }
@@ -117,6 +129,11 @@ PhotoRecord *PhotoRepository::importPhoto(const QString &sourcePath, QString *er
         if (error) *error = "Not enough memory to add the photo record.";
         return nullptr;
     }
+    album_tree_add_photo(
+    &m_albumTree,
+    added->album_name,
+    added->id
+);
     if (!save(error)) {
         photo_list_remove(&m_list, added->id);
         QFile::remove(managedPath);
@@ -133,7 +150,21 @@ QVector<PhotoRecord *> PhotoRepository::records() const {
     return result;
 }
 
-bool PhotoRepository::removeRecord(int id) { return photo_list_remove(&m_list, id) != 0; }
+bool PhotoRepository::removeRecord(int id) {
+    PhotoRecord *record = photo_list_find(&m_list, id);
+
+    if (record == nullptr) {
+        return false;
+    }
+
+    album_tree_remove_photo(
+        &m_albumTree,
+        record->album_name,
+        record->id
+    );
+
+    return photo_list_remove(&m_list, id) != 0;
+}
 
 void PhotoRepository::sortByColumn(int column) {
     if (column == 1) photo_list_sort_by_name(&m_list);
