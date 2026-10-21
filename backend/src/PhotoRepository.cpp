@@ -30,43 +30,51 @@ bool PhotoRepository::load(QString *error) {
 photo_list_clear(&m_list);
 album_tree_clear(&m_albumTree);
 album_tree_init(&m_albumTree, “All Photos”);
+
 QFile file(metadataPath());
-    if (!file.exists()) return true;
-    if (!file.open(QIODevice::ReadOnly)) {
-        if (error) *error = "Cannot open metadata file.";
-        return false;
+if (!file.exists()) return true;
+if (!file.open(QIODevice::ReadOnly)) {
+    if (error) *error = "Cannot open metadata file.";
+    return false;
+}
+QJsonParseError parseError;
+const QJsonDocument document =
+    QJsonDocument::fromJson(file.readAll(), &parseError);
+if (parseError.error != QJsonParseError::NoError ||
+    !document.isArray()) {
+    if (error) *error = "Metadata file is not valid JSON.";
+    return false;
+}
+for (const QJsonValue &value : document.array()) {
+    const QJsonObject object = value.toObject();
+    PhotoRecord record{};
+    record.id = object.value("id").toInt();
+    copyText(record.name, PHOTO_NAME_LENGTH,
+             object.value("name").toString());
+    copyText(record.file_path, PHOTO_PATH_LENGTH,
+             object.value("filePath").toString());
+    copyText(record.date_added, PHOTO_DATE_LENGTH,
+             object.value("dateAdded").toString());
+    copyText(record.archive_path, PHOTO_PATH_LENGTH,
+             object.value("archivePath").toString());
+    copyText(record.album_name, PHOTO_ALBUM_LENGTH,
+             object.value("albumName").toString("All Photos"));
+    record.original_size =
+        object.value("originalSize").toVariant().toLongLong();
+    record.stored_size =
+        object.value("storedSize").toVariant().toLongLong();
+    record.archived = object.value("archived").toBool() ? 1 : 0;
+    PhotoRecord *addedRecord = photo_list_add(&m_list, &record);
+    if (addedRecord != nullptr) {
+        album_tree_add_photo(
+            &m_albumTree,
+            addedRecord->album_name,
+            addedRecord->id
+        );
     }
+}
+return true;
 
-    QJsonParseError parseError;
-    const QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &parseError);
-    if (parseError.error != QJsonParseError::NoError || !document.isArray()) {
-        if (error) *error = "Metadata file is not valid JSON.";
-        return false;
-    }
-
-    for (const QJsonValue &value : document.array()) {
-        const QJsonObject object = value.toObject();
-        PhotoRecord record{};
-        record.id = object.value("id").toInt();
-        copyText(record.name, PHOTO_NAME_LENGTH, object.value("name").toString());
-        copyText(record.file_path, PHOTO_PATH_LENGTH, object.value("filePath").toString());
-        copyText(record.date_added, PHOTO_DATE_LENGTH, object.value("dateAdded").toString());
-        copyText(record.archive_path, PHOTO_PATH_LENGTH, object.value("archivePath").toString());
-        copyText(record.album_name, PHOTO_ALBUM_LENGTH, object.value("albumName").toString("All Photos"));
-        record.original_size = object.value("originalSize").toVariant().toLongLong();
-        record.stored_size = object.value("storedSize").toVariant().toLongLong();
-        record.archived = object.value("archived").toBool() ? 1 : 0;
-        PhotoRecord *addedRecord = photo_list_add(&m_list, &record);
-
-if (addedRecord != nullptr) {
-album_tree_add_photo(
-&m_albumTree,
-addedRecord->album_name,
-addedRecord->id
-);
-
-    }
-    return true;
 }
 
 bool PhotoRepository::save(QString *error) const {

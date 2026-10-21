@@ -30,7 +30,7 @@ public:
 
 private:
     PhotoList m_list;
-    Albumtree m_albumTree;
+    AlbumTree m_albumTree;
     QString m_storageRoot;
     static void copyText(char *destination, int length, const QString &value);
 };
