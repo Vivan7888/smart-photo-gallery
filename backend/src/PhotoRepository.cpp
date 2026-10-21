@@ -29,7 +29,7 @@ void PhotoRepository::copyText(char *destination, int length, const QString &val
 bool PhotoRepository::load(QString *error) {
 photo_list_clear(&m_list);
 album_tree_clear(&m_albumTree);
-album_tree_init(&m_albumTree, “All Photos”);
+album_tree_init(&m_albumTree, "All Photos");
 
 QFile file(metadataPath());
 if (!file.exists()) return true;
