@@ -117,24 +117,39 @@ void photo_queue_clear(PhotoQueue *queue) {
     while (photo_queue_dequeue(queue, &ignored)) { }
 }
 
+
 void photo_queue_enqueue(PhotoQueue *queue, int photo_id) {
+    if (queue == NULL) return;
+
     QueueNode *node = (QueueNode *)malloc(sizeof(QueueNode));
     if (node == NULL) return;
+
     node->photo_id = photo_id;
     node->next = NULL;
-    if (queue->rear == NULL) queue->front = queue->rear = node;
-    else { queue->rear->next = node; queue->rear = node; }
+
+    if (queue->rear == NULL) {
+        queue->front = queue->rear = node;
+    } else {
+        queue->rear->next = node;
+        queue->rear = node;
+    }
 }
 
 int photo_queue_dequeue(PhotoQueue *queue, int *photo_id) {
-    if (queue->front == NULL) return 0;
+    if (queue == NULL || photo_id == NULL || queue->front == NULL)
+        return 0;
+
     QueueNode *node = queue->front;
     *photo_id = node->photo_id;
     queue->front = node->next;
-    if (queue->front == NULL) queue->rear = NULL;
+
+    if (queue->front == NULL)
+        queue->rear = NULL;
+
     free(node);
     return 1;
 }
+
 
 void action_stack_init(ActionStack *stack) { stack->top = NULL; }
 
