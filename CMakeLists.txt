@@ -11,6 +11,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 add_library(photo_data_structures
     data-structures/src/photo_ds.c
+    data-structures/src/album_tree.c
 )
 target_include_directories(photo_data_structures PUBLIC data-structures/include)
 
