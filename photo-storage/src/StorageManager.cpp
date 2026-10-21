@@ -97,11 +97,22 @@ bool StorageManager::restorePhoto(PhotoRecord &record, QString *error) {
         if (error) *error = "Could not restore the active photo file.";
         return false;
     }
-    QFile::remove(QString::fromUtf8(record.archive_path));
+        const QByteArray previousArchivePath(record.archive_path);
+    const auto previousStoredSize = record.stored_size;
+
     record.archived = 0;
     record.archive_path[0] = '\0';
     record.stored_size = originalBytes.size();
-    return m_repository.save(error);
+
+    if (!m_repository.save(error)) {
+        record.archived = 1;
+        qstrncpy(record.archive_path, previousArchivePath.constData(), PHOTO_PATH_LENGTH);
+        record.stored_size = previousStoredSize;
+        return false;
+    }
+
+    QFile::remove(QString::fromUtf8(previousArchivePath));
+    return true;
 }
 
 QString StorageManager::previewPath(const PhotoRecord &record, bool *isTemporary, QString *error) const {
