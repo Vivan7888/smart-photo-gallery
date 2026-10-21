@@ -19,8 +19,15 @@ QString StorageManager::archiveDirectory() const {
 }
 
 bool StorageManager::isOlderThanOneYear(const PhotoRecord &record) const {
-    const QDate addedDate = QDate::fromString(QString::fromUtf8(record.date_added), Qt::ISODate);
-    return addedDate.isValid() && addedDate <= QDate::currentDate().addYears(-1);
+    const QString dateString = QString::fromUtf8(record.date_added);
+    const QDate addedDate = QDate::fromString(dateString, Qt::ISODate);
+
+    if (!addedDate.isValid()) {
+        return false;
+    }
+
+    const QDate oneYearAgo = QDate::currentDate().addYears(-1);
+    return addedDate <= oneYearAgo;
 }
 
 bool StorageManager::archivePhoto(PhotoRecord &record, bool manualOverride, QString *error) {
