@@ -2,6 +2,7 @@
 
 #include "Photo.h"
 
+#include <QColor>
 #include <QDate>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -42,58 +43,94 @@ MainWindow::~MainWindow() { action_stack_clear(&m_actions); }
 
 void MainWindow::buildUi() {
     setWindowTitle("Smart Photo Gallery");
-    resize(1120, 720);
+    resize(1200, 760);
     setMinimumSize(860, 580);
     setStyleSheet(
-        "QMainWindow { background: #f6f8fb; }"
-        "QFrame#summaryCard { background: white; border: 1px solid #e2e8f0; border-radius: 10px; }"
-        "QPushButton { background: #2563eb; color: white; border: none; border-radius: 6px; padding: 8px 12px; }"
-        "QPushButton:hover { background: #1d4ed8; }"
-        "QLineEdit { background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; }"
-        "QTableWidget { background: white; border: 1px solid #e2e8f0; border-radius: 8px; gridline-color: #edf2f7; }"
-        "QHeaderView::section { background: #eff6ff; border: none; border-bottom: 1px solid #dbeafe; padding: 8px; font-weight: bold; }");
+        "QMainWindow { background: #0b1220; }"
+        "QWidget#galleryRoot { background: #0b1220; }"
+        "QFrame#heroPanel { background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #172554, stop:0.48 #172554, stop:1 #0f766e); border: 1px solid #334a81; border-radius: 18px; }"
+        "QFrame#summaryCard { background: #121c2f; border: 1px solid #263652; border-radius: 14px; }"
+        "QFrame#controlPanel { background: #101a2c; border: 1px solid #263652; border-radius: 14px; }"
+        "QPushButton { background: #24324b; color: #dbeafe; border: 1px solid #354867; border-radius: 9px; padding: 9px 13px; font-weight: 600; }"
+        "QPushButton:hover { background: #334665; border-color: #5b7baa; }"
+        "QPushButton#primaryButton { background: #2563eb; color: white; border-color: #3b82f6; }"
+        "QPushButton#primaryButton:hover { background: #1d4ed8; }"
+        "QPushButton#archiveButton { color: #fde68a; }"
+        "QPushButton#dangerButton { background: #3b1b2c; color: #fecdd3; border-color: #7f3148; }"
+        "QPushButton#dangerButton:hover { background: #5b1f37; }"
+        "QLineEdit { background: #0b1322; color: #e2e8f0; border: 1px solid #354867; border-radius: 9px; padding: 9px 12px; selection-background-color: #2563eb; }"
+        "QLineEdit:focus { border: 1px solid #60a5fa; }"
+        "QTableWidget { background: #101a2c; alternate-background-color: #131f34; color: #e2e8f0; border: 1px solid #263652; border-radius: 14px; gridline-color: #1d2b43; selection-background-color: #1e3a5f; selection-color: #ffffff; }"
+        "QHeaderView::section { background: #16233a; color: #93c5fd; border: none; border-bottom: 1px solid #334155; padding: 11px 9px; font-weight: 700; }"
+        "QTableCornerButton::section { background: #16233a; border: none; }"
+        "QStatusBar { background: #0b1220; color: #94a3b8; border-top: 1px solid #1e293b; }");
 
     auto *central = new QWidget(this);
+    central->setObjectName("galleryRoot");
     auto *mainLayout = new QVBoxLayout(central);
-    mainLayout->setContentsMargins(24, 20, 24, 20);
-    mainLayout->setSpacing(14);
+    mainLayout->setContentsMargins(28, 26, 28, 22);
+    mainLayout->setSpacing(16);
 
-    auto *title = new QLabel("Smart Photo Gallery", central);
-    title->setStyleSheet("font-size: 25px; font-weight: 700; color: #0f172a;");
-    mainLayout->addWidget(title);
-
-    auto *subtitle = new QLabel("Keep photos local. Archive eligible old files and restore them temporarily for viewing.", central);
-    subtitle->setStyleSheet("color: #475569;");
-    mainLayout->addWidget(subtitle);
+    auto *heroPanel = new QFrame(central);
+    heroPanel->setObjectName("heroPanel");
+    auto *heroLayout = new QVBoxLayout(heroPanel);
+    heroLayout->setContentsMargins(24, 20, 24, 20);
+    heroLayout->setSpacing(5);
+    auto *eyebrow = new QLabel("LOCAL-FIRST PHOTO ARCHIVE", heroPanel);
+    eyebrow->setStyleSheet("color: #a5f3fc; font-size: 11px; font-weight: 700; letter-spacing: 1px;");
+    auto *title = new QLabel("Smart Photo Gallery", heroPanel);
+    title->setStyleSheet("font-size: 30px; font-weight: 800; color: white;");
+    auto *subtitle = new QLabel("Keep memories on your device. Archive older photos, recover them instantly when you need them.", heroPanel);
+    subtitle->setStyleSheet("color: #dbeafe; font-size: 14px;");
+    heroLayout->addWidget(eyebrow);
+    heroLayout->addWidget(title);
+    heroLayout->addWidget(subtitle);
+    mainLayout->addWidget(heroPanel);
 
     auto *summaryLayout = new QHBoxLayout;
-    auto createCard = [central](const QString &caption, QLabel **valueLabel) {
+    summaryLayout->setSpacing(12);
+    auto createCard = [central](const QString &caption, const QString &accent, QLabel **valueLabel) {
         auto *card = new QFrame(central);
         card->setObjectName("summaryCard");
         auto *layout = new QVBoxLayout(card);
+        layout->setContentsMargins(18, 15, 18, 15);
+        layout->setSpacing(4);
         auto *captionLabel = new QLabel(caption, card);
-        captionLabel->setStyleSheet("color: #64748b;");
+        captionLabel->setStyleSheet("color: #94a3b8; font-weight: 600;");
         *valueLabel = new QLabel("0", card);
-        (*valueLabel)->setStyleSheet("font-size: 20px; font-weight: 700; color: #0f172a;");
+        (*valueLabel)->setStyleSheet("font-size: 25px; font-weight: 800; color: " + accent + ";");
         layout->addWidget(captionLabel);
         layout->addWidget(*valueLabel);
         return card;
     };
-    summaryLayout->addWidget(createCard("Photos", &m_photoCountLabel));
-    summaryLayout->addWidget(createCard("Managed storage", &m_storageLabel));
-    summaryLayout->addWidget(createCard("Eligible for archive", &m_oldPhotoLabel));
+    summaryLayout->addWidget(createCard("PHOTOS IN LIBRARY", "#93c5fd", &m_photoCountLabel));
+    summaryLayout->addWidget(createCard("MANAGED STORAGE", "#5eead4", &m_storageLabel));
+    summaryLayout->addWidget(createCard("READY TO ARCHIVE", "#fcd34d", &m_oldPhotoLabel));
     mainLayout->addLayout(summaryLayout);
 
-    auto *controls = new QHBoxLayout;
-    auto *addButton = new QPushButton("Add Photos", central);
-    auto *archiveButton = new QPushButton("Archive Selected(Any Age)", central);
-    auto *archiveOlderButton = new QPushButton("Archive Old Photos", central);
-    auto *previewButton = new QPushButton("Preview", central);
-    auto *undoButton = new QPushButton("Undo Archive", central);
-    auto *deleteButton = new QPushButton("Delete", central);
-    deleteButton->setStyleSheet("QPushButton { background: #dc2626; color: white; border: none; border-radius: 6px; padding: 8px 12px; } QPushButton:hover { background: #b91c1c; }");
-    m_searchInput = new QLineEdit(central);
-    m_searchInput->setPlaceholderText("Search by photo name or date...");
+    auto *controlPanel = new QFrame(central);
+    controlPanel->setObjectName("controlPanel");
+    auto *controls = new QHBoxLayout(controlPanel);
+    controls->setContentsMargins(12, 12, 12, 12);
+    controls->setSpacing(9);
+    auto *addButton = new QPushButton("+  Add photos", controlPanel);
+    addButton->setObjectName("primaryButton");
+    auto *archiveButton = new QPushButton("Archive selected", controlPanel);
+    archiveButton->setObjectName("archiveButton");
+    auto *archiveOlderButton = new QPushButton("Archive eligible", controlPanel);
+    archiveOlderButton->setObjectName("archiveButton");
+    auto *previewButton = new QPushButton("Preview", controlPanel);
+    auto *undoButton = new QPushButton("Undo archive", controlPanel);
+    auto *deleteButton = new QPushButton("Delete", controlPanel);
+    deleteButton->setObjectName("dangerButton");
+    m_searchInput = new QLineEdit(controlPanel);
+    m_searchInput->setPlaceholderText("Search photos or dates...");
+    m_searchInput->setMinimumWidth(210);
+    addButton->setToolTip("Import photos into local managed storage");
+    archiveButton->setToolTip("Archive the selected photo, regardless of its date");
+    archiveOlderButton->setToolTip("Archive every photo that is at least one year old");
+    previewButton->setToolTip("Open the selected image; archived files are restored temporarily");
+    undoButton->setToolTip("Restore the most recently archived photo");
 
     controls->addWidget(addButton);
     controls->addWidget(archiveButton);
@@ -103,13 +140,17 @@ void MainWindow::buildUi() {
     controls->addWidget(deleteButton);
     controls->addStretch();
     controls->addWidget(m_searchInput, 1);
-    mainLayout->addLayout(controls);
+    mainLayout->addWidget(controlPanel);
 
     m_photoTable = new QTableWidget(0, 6, central);
     m_photoTable->setHorizontalHeaderLabels({"ID", "Photo", "Date", "Original size", "Currently used", "Status"});
     m_photoTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_photoTable->setSelectionMode(QAbstractItemView::SingleSelection);
     m_photoTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_photoTable->setAlternatingRowColors(true);
+    m_photoTable->setShowGrid(false);
+    m_photoTable->setFocusPolicy(Qt::NoFocus);
+    m_photoTable->verticalHeader()->setDefaultSectionSize(42);
     m_photoTable->verticalHeader()->setVisible(false);
     m_photoTable->horizontalHeader()->setStretchLastSection(true);
     m_photoTable->setColumnWidth(0, 55);
@@ -118,7 +159,7 @@ void MainWindow::buildUi() {
     mainLayout->addWidget(m_photoTable, 1);
 
     setCentralWidget(central);
-    statusBar()->showMessage("Ready");
+    statusBar()->showMessage("Ready — your photos stay local.");
 
     connect(addButton, &QPushButton::clicked, this, [this] { importPhotos(); });
     connect(previewButton, &QPushButton::clicked, this, [this] { previewSelectedPhoto(); });
@@ -161,14 +202,25 @@ void MainWindow::refreshTable() {
         m_photoTable->insertRow(row);
         auto *idItem = new QTableWidgetItem(QString::number(photo.id()));
         idItem->setData(Qt::UserRole, photo.id());
+        idItem->setTextAlignment(Qt::AlignCenter);
+        idItem->setForeground(QColor("#93c5fd"));
         m_photoTable->setItem(row, 0, idItem);
         auto *nameItem = new QTableWidgetItem(photo.name());
         nameItem->setToolTip(QString::fromUtf8(record->file_path));
         m_photoTable->setItem(row, 1, nameItem);
-        m_photoTable->setItem(row, 2, new QTableWidgetItem(photo.dateAdded()));
-        m_photoTable->setItem(row, 3, new QTableWidgetItem(formatBytes(photo.originalSize())));
-        m_photoTable->setItem(row, 4, new QTableWidgetItem(formatBytes(photo.storedSize())));
-        m_photoTable->setItem(row, 5, new QTableWidgetItem(photo.isArchived() ? "Archived" : "Active"));
+        auto *dateItem = new QTableWidgetItem(photo.dateAdded());
+        dateItem->setTextAlignment(Qt::AlignCenter);
+        m_photoTable->setItem(row, 2, dateItem);
+        auto *originalSizeItem = new QTableWidgetItem(formatBytes(photo.originalSize()));
+        originalSizeItem->setTextAlignment(Qt::AlignCenter);
+        m_photoTable->setItem(row, 3, originalSizeItem);
+        auto *storedSizeItem = new QTableWidgetItem(formatBytes(photo.storedSize()));
+        storedSizeItem->setTextAlignment(Qt::AlignCenter);
+        m_photoTable->setItem(row, 4, storedSizeItem);
+        auto *statusItem = new QTableWidgetItem(photo.isArchived() ? "ARCHIVED" : "ACTIVE");
+        statusItem->setTextAlignment(Qt::AlignCenter);
+        statusItem->setForeground(photo.isArchived() ? QColor("#fcd34d") : QColor("#5eead4"));
+        m_photoTable->setItem(row, 5, statusItem);
     }
     updateSummary();
 }
