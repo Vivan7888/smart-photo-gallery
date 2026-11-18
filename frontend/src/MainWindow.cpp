@@ -46,24 +46,25 @@ void MainWindow::buildUi() {
     resize(1200, 760);
     setMinimumSize(860, 580);
     setStyleSheet(
-        "QMainWindow { background: #0b1220; }"
-        "QWidget#galleryRoot { background: #0b1220; }"
-        "QFrame#heroPanel { background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #172554, stop:0.48 #172554, stop:1 #0f766e); border: 1px solid #334a81; border-radius: 18px; }"
-        "QFrame#summaryCard { background: #121c2f; border: 1px solid #263652; border-radius: 14px; }"
-        "QFrame#controlPanel { background: #101a2c; border: 1px solid #263652; border-radius: 14px; }"
-        "QPushButton { background: #24324b; color: #dbeafe; border: 1px solid #354867; border-radius: 9px; padding: 9px 13px; font-weight: 600; }"
-        "QPushButton:hover { background: #334665; border-color: #5b7baa; }"
-        "QPushButton#primaryButton { background: #2563eb; color: white; border-color: #3b82f6; }"
-        "QPushButton#primaryButton:hover { background: #1d4ed8; }"
-        "QPushButton#archiveButton { color: #fde68a; }"
-        "QPushButton#dangerButton { background: #3b1b2c; color: #fecdd3; border-color: #7f3148; }"
-        "QPushButton#dangerButton:hover { background: #5b1f37; }"
-        "QLineEdit { background: #0b1322; color: #e2e8f0; border: 1px solid #354867; border-radius: 9px; padding: 9px 12px; selection-background-color: #2563eb; }"
-        "QLineEdit:focus { border: 1px solid #60a5fa; }"
-        "QTableWidget { background: #101a2c; alternate-background-color: #131f34; color: #e2e8f0; border: 1px solid #263652; border-radius: 14px; gridline-color: #1d2b43; selection-background-color: #1e3a5f; selection-color: #ffffff; }"
-        "QHeaderView::section { background: #16233a; color: #93c5fd; border: none; border-bottom: 1px solid #334155; padding: 11px 9px; font-weight: 700; }"
-        "QTableCornerButton::section { background: #16233a; border: none; }"
-        "QStatusBar { background: #0b1220; color: #94a3b8; border-top: 1px solid #1e293b; }");
+        "QMainWindow { background: #f8f7fc; }"
+        "QWidget#galleryRoot { background: #f8f7fc; }"
+        "QFrame#heroPanel { background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #f0eaff, stop:0.55 #faf7ff, stop:1 #e8f4ff); border: 1px solid #ddd3f5; border-radius: 18px; }"
+        "QFrame#summaryCard { background: white; border: 1px solid #e5e1ed; border-radius: 14px; }"
+        "QFrame#controlPanel { background: white; border: 1px solid #e5e1ed; border-radius: 14px; }"
+        "QPushButton { background: #f3f0f8; color: #463c56; border: 1px solid #dfd7ea; border-radius: 9px; padding: 9px 14px; font-weight: 600; }"
+        "QPushButton:hover { background: #ebe5f4; border-color: #b9a9d4; }"
+        "QPushButton#primaryButton { background: #7357c9; color: white; border-color: #7357c9; }"
+        "QPushButton#primaryButton:hover { background: #6044b5; }"
+        "QPushButton#archiveButton { background: #fff6dd; color: #8a5b00; border-color: #f2d68b; }"
+        "QPushButton#archiveButton:hover { background: #ffedbd; }"
+        "QPushButton#dangerButton { background: #fff0f1; color: #b53b50; border-color: #f2bdc6; }"
+        "QPushButton#dangerButton:hover { background: #ffdfe3; }"
+        "QLineEdit { background: #fbfaff; color: #3b3349; border: 1px solid #ded6ea; border-radius: 9px; padding: 9px 12px; selection-background-color: #7357c9; }"
+        "QLineEdit:focus { border: 1px solid #8f78d7; }"
+        "QTableWidget { background: white; alternate-background-color: #fbfaff; color: #3b3349; border: 1px solid #e5e1ed; border-radius: 14px; gridline-color: #f0edf5; selection-background-color: #eee9fb; selection-color: #2f2443; }"
+        "QHeaderView::section { background: #f5f2fa; color: #5e4b82; border: none; border-bottom: 1px solid #e4deed; padding: 12px 10px; font-weight: 700; }"
+        "QTableCornerButton::section { background: #f5f2fa; border: none; }"
+        "QStatusBar { background: #f8f7fc; color: #756b83; border-top: 1px solid #e7e2ee; }");
 
     auto *central = new QWidget(this);
     central->setObjectName("galleryRoot");
@@ -77,11 +78,11 @@ void MainWindow::buildUi() {
     heroLayout->setContentsMargins(24, 20, 24, 20);
     heroLayout->setSpacing(5);
     auto *eyebrow = new QLabel("LOCAL-FIRST PHOTO ARCHIVE", heroPanel);
-    eyebrow->setStyleSheet("color: #a5f3fc; font-size: 11px; font-weight: 700; letter-spacing: 1px;");
+    eyebrow->setStyleSheet("color: #7357c9; font-size: 11px; font-weight: 700; letter-spacing: 1px;");
     auto *title = new QLabel("Smart Photo Gallery", heroPanel);
-    title->setStyleSheet("font-size: 30px; font-weight: 800; color: white;");
+    title->setStyleSheet("font-size: 30px; font-weight: 800; color: #302142;");
     auto *subtitle = new QLabel("Keep memories on your device. Archive older photos, recover them instantly when you need them.", heroPanel);
-    subtitle->setStyleSheet("color: #dbeafe; font-size: 14px;");
+    subtitle->setStyleSheet("color: #685c78; font-size: 14px;");
     heroLayout->addWidget(eyebrow);
     heroLayout->addWidget(title);
     heroLayout->addWidget(subtitle);
@@ -96,23 +97,34 @@ void MainWindow::buildUi() {
         layout->setContentsMargins(18, 15, 18, 15);
         layout->setSpacing(4);
         auto *captionLabel = new QLabel(caption, card);
-        captionLabel->setStyleSheet("color: #94a3b8; font-weight: 600;");
+        captionLabel->setStyleSheet("color: #837990; font-weight: 600;");
         *valueLabel = new QLabel("0", card);
         (*valueLabel)->setStyleSheet("font-size: 25px; font-weight: 800; color: " + accent + ";");
         layout->addWidget(captionLabel);
         layout->addWidget(*valueLabel);
         return card;
     };
-    summaryLayout->addWidget(createCard("PHOTOS IN LIBRARY", "#93c5fd", &m_photoCountLabel));
-    summaryLayout->addWidget(createCard("MANAGED STORAGE", "#5eead4", &m_storageLabel));
-    summaryLayout->addWidget(createCard("READY TO ARCHIVE", "#fcd34d", &m_oldPhotoLabel));
+    summaryLayout->addWidget(createCard("PHOTOS IN LIBRARY", "#7357c9", &m_photoCountLabel));
+    summaryLayout->addWidget(createCard("MANAGED STORAGE", "#168c7b", &m_storageLabel));
+    summaryLayout->addWidget(createCard("READY TO ARCHIVE", "#c17b10", &m_oldPhotoLabel));
     mainLayout->addLayout(summaryLayout);
 
     auto *controlPanel = new QFrame(central);
     controlPanel->setObjectName("controlPanel");
-    auto *controls = new QHBoxLayout(controlPanel);
-    controls->setContentsMargins(12, 12, 12, 12);
-    controls->setSpacing(9);
+    auto *controls = new QVBoxLayout(controlPanel);
+    controls->setContentsMargins(14, 13, 14, 13);
+    controls->setSpacing(11);
+    auto *controlTopRow = new QHBoxLayout;
+    auto *controlTitle = new QLabel("Manage your collection", controlPanel);
+    controlTitle->setStyleSheet("color: #403651; font-weight: 700; font-size: 14px;");
+    m_searchInput = new QLineEdit(controlPanel);
+    m_searchInput->setPlaceholderText("Search photos or dates...");
+    m_searchInput->setMinimumWidth(280);
+    controlTopRow->addWidget(controlTitle);
+    controlTopRow->addStretch();
+    controlTopRow->addWidget(m_searchInput, 1);
+    auto *actionRow = new QHBoxLayout;
+    actionRow->setSpacing(9);
     auto *addButton = new QPushButton("+  Add photos", controlPanel);
     addButton->setObjectName("primaryButton");
     auto *archiveButton = new QPushButton("Archive selected", controlPanel);
@@ -123,23 +135,21 @@ void MainWindow::buildUi() {
     auto *undoButton = new QPushButton("Undo archive", controlPanel);
     auto *deleteButton = new QPushButton("Delete", controlPanel);
     deleteButton->setObjectName("dangerButton");
-    m_searchInput = new QLineEdit(controlPanel);
-    m_searchInput->setPlaceholderText("Search photos or dates...");
-    m_searchInput->setMinimumWidth(210);
     addButton->setToolTip("Import photos into local managed storage");
     archiveButton->setToolTip("Archive the selected photo, regardless of its date");
     archiveOlderButton->setToolTip("Archive every photo that is at least one year old");
     previewButton->setToolTip("Open the selected image; archived files are restored temporarily");
     undoButton->setToolTip("Restore the most recently archived photo");
 
-    controls->addWidget(addButton);
-    controls->addWidget(archiveButton);
-    controls->addWidget(archiveOlderButton);
-    controls->addWidget(previewButton);
-    controls->addWidget(undoButton);
-    controls->addWidget(deleteButton);
-    controls->addStretch();
-    controls->addWidget(m_searchInput, 1);
+    actionRow->addWidget(addButton);
+    actionRow->addWidget(previewButton);
+    actionRow->addWidget(archiveButton);
+    actionRow->addWidget(archiveOlderButton);
+    actionRow->addWidget(undoButton);
+    actionRow->addWidget(deleteButton);
+    actionRow->addStretch();
+    controls->addLayout(controlTopRow);
+    controls->addLayout(actionRow);
     mainLayout->addWidget(controlPanel);
 
     m_photoTable = new QTableWidget(0, 6, central);
@@ -152,10 +162,14 @@ void MainWindow::buildUi() {
     m_photoTable->setFocusPolicy(Qt::NoFocus);
     m_photoTable->verticalHeader()->setDefaultSectionSize(42);
     m_photoTable->verticalHeader()->setVisible(false);
-    m_photoTable->horizontalHeader()->setStretchLastSection(true);
-    m_photoTable->setColumnWidth(0, 55);
-    m_photoTable->setColumnWidth(1, 250);
-    m_photoTable->setColumnWidth(2, 110);
+    auto *tableHeader = m_photoTable->horizontalHeader();
+    tableHeader->setMinimumSectionSize(80);
+    tableHeader->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    tableHeader->setSectionResizeMode(1, QHeaderView::Stretch);
+    tableHeader->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    tableHeader->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    tableHeader->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+    tableHeader->setSectionResizeMode(5, QHeaderView::ResizeToContents);
     mainLayout->addWidget(m_photoTable, 1);
 
     setCentralWidget(central);
@@ -203,7 +217,7 @@ void MainWindow::refreshTable() {
         auto *idItem = new QTableWidgetItem(QString::number(photo.id()));
         idItem->setData(Qt::UserRole, photo.id());
         idItem->setTextAlignment(Qt::AlignCenter);
-        idItem->setForeground(QColor("#93c5fd"));
+        idItem->setForeground(QColor("#7357c9"));
         m_photoTable->setItem(row, 0, idItem);
         auto *nameItem = new QTableWidgetItem(photo.name());
         nameItem->setToolTip(QString::fromUtf8(record->file_path));
@@ -219,7 +233,7 @@ void MainWindow::refreshTable() {
         m_photoTable->setItem(row, 4, storedSizeItem);
         auto *statusItem = new QTableWidgetItem(photo.isArchived() ? "ARCHIVED" : "ACTIVE");
         statusItem->setTextAlignment(Qt::AlignCenter);
-        statusItem->setForeground(photo.isArchived() ? QColor("#fcd34d") : QColor("#5eead4"));
+        statusItem->setForeground(photo.isArchived() ? QColor("#b77913") : QColor("#168c7b"));
         m_photoTable->setItem(row, 5, statusItem);
     }
     updateSummary();
