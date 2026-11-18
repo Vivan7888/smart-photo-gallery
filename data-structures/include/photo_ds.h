@@ -9,6 +9,7 @@ extern "C" {
 #define PHOTO_PATH_LENGTH 1024
 #define PHOTO_DATE_LENGTH 16
 #define PHOTO_ALBUM_LENGTH 100
+#define PHOTO_HASH_LENGTH 65
 
 typedef struct PhotoRecord {
     int id;
@@ -17,6 +18,8 @@ typedef struct PhotoRecord {
     char date_added[PHOTO_DATE_LENGTH];
     char archive_path[PHOTO_PATH_LENGTH];
     char album_name[PHOTO_ALBUM_LENGTH];
+    /* SHA-256 as 64 hexadecimal characters plus the terminating '\0'. */
+    char content_hash[PHOTO_HASH_LENGTH];
     long long original_size;
     long long stored_size;
     int archived;

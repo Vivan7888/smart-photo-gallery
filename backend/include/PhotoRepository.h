@@ -33,6 +33,8 @@ private:
     AlbumTree m_albumTree;
     QString m_storageRoot;
     static void copyText(char *destination, int length, const QString &value);
+    static QString calculateFileHash(const QString &path, QString *error);
+    PhotoRecord *findByContentHash(const QString &hash) const;
 };
 
 #endif
