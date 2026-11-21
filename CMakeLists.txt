@@ -53,9 +53,18 @@ if(APPLE)
     # Qt's camera permission backend is a specialised static plugin. Import it
     # explicitly so QCameraPermission can show macOS's permission prompt.
     include("${Qt${QT_VERSION_MAJOR}Core_DIR}/Qt${QT_VERSION_MAJOR}QDarwinCameraPermissionPluginConfig.cmake")
+    set_property(TARGET SmartPhotoGallery PROPERTY
+        _qt_has_QDarwinCameraPermissionPlugin_usage_description TRUE
+    )
     qt_import_plugins(SmartPhotoGallery INCLUDE Qt${QT_VERSION_MAJOR}::QDarwinCameraPermissionPlugin)
     set_target_properties(SmartPhotoGallery PROPERTIES
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/frontend/resources/Info.plist"
+    )
+    # A local ad-hoc signature binds Info.plist to the debug bundle, which is
+    # required for macOS privacy services to identify this development app.
+    add_custom_command(TARGET SmartPhotoGallery POST_BUILD
+        COMMAND codesign --force --deep --sign - "$<TARGET_BUNDLE_DIR:SmartPhotoGallery>"
+        COMMENT "Ad-hoc signing SmartPhotoGallery for macOS permissions"
     )
 endif()

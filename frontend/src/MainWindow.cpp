@@ -250,6 +250,16 @@ void MainWindow::capturePhoto() {
     QCameraPermission permission;
     switch (qApp->checkPermission(permission)) {
     case Qt::PermissionStatus::Undetermined:
+        if (QMessageBox::question(
+                this,
+                "Allow camera access?",
+                "Smart Photo Gallery needs your camera only to capture photos directly "
+                "into this local gallery.\n\nContinue to the macOS permission prompt?",
+                QMessageBox::Cancel | QMessageBox::Yes,
+                QMessageBox::Yes
+            ) != QMessageBox::Yes) {
+            return;
+        }
         qApp->requestPermission(permission, this, [this](const QPermission &result) {
             if (result.status() == Qt::PermissionStatus::Granted) {
                 capturePhoto();

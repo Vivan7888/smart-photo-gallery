@@ -8,7 +8,7 @@ class QImageCapture;
 class QMediaCaptureSession;
 class QLabel;
 class QPushButton;
-class QVideoWidget;
+class QVideoSink;
 
 class CameraCaptureDialog : public QDialog {
 public:
@@ -23,7 +23,8 @@ private:
     QCamera *m_camera = nullptr;
     QMediaCaptureSession *m_captureSession = nullptr;
     QImageCapture *m_imageCapture = nullptr;
-    QVideoWidget *m_viewfinder = nullptr;
+    QVideoSink *m_videoSink = nullptr;
+    QLabel *m_viewfinder = nullptr;
     QLabel *m_messageLabel = nullptr;
     QPushButton *m_captureButton = nullptr;
     QString m_capturedImagePath;

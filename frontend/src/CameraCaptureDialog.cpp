@@ -4,14 +4,17 @@
 #include <QDateTime>
 #include <QDir>
 #include <QImageCapture>
+#include <QImage>
 #include <QLabel>
 #include <QMediaCaptureSession>
 #include <QMediaDevices>
+#include <QPixmap>
 #include <QPushButton>
 #include <QStandardPaths>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QVideoWidget>
+#include <QVideoFrame>
+#include <QVideoSink>
 
 CameraCaptureDialog::CameraCaptureDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle("Capture a photo");
@@ -22,7 +25,7 @@ CameraCaptureDialog::CameraCaptureDialog(QWidget *parent) : QDialog(parent) {
         "QDialog { background: #f8f7fc; }"
         "QLabel#cameraTitle { color: #302142; font-size: 21px; font-weight: 800; }"
         "QLabel#cameraHint { color: #756b83; }"
-        "QVideoWidget { background: #201a2a; border: 1px solid #ddd3f5; border-radius: 12px; }"
+        "QLabel#viewfinder { background: #201a2a; border: 1px solid #ddd3f5; border-radius: 12px; }"
         "QPushButton { background: #f3f0f8; color: #463c56; border: 1px solid #dfd7ea; border-radius: 9px; padding: 9px 16px; font-weight: 600; }"
         "QPushButton:hover { background: #ebe5f4; }"
         "QPushButton#captureButton { background: #7357c9; color: white; border-color: #7357c9; }"
@@ -36,7 +39,10 @@ CameraCaptureDialog::CameraCaptureDialog(QWidget *parent) : QDialog(parent) {
     title->setObjectName("cameraTitle");
     auto *hint = new QLabel("Your photo will be imported directly into Smart Photo Gallery.", this);
     hint->setObjectName("cameraHint");
-    m_viewfinder = new QVideoWidget(this);
+    m_viewfinder = new QLabel(this);
+    m_viewfinder->setObjectName("viewfinder");
+    m_viewfinder->setAlignment(Qt::AlignCenter);
+    m_viewfinder->setText("Starting camera preview…");
     m_messageLabel = new QLabel("Starting camera…", this);
     m_messageLabel->setObjectName("cameraHint");
 
@@ -66,9 +72,23 @@ CameraCaptureDialog::CameraCaptureDialog(QWidget *parent) : QDialog(parent) {
     m_camera = new QCamera(QMediaDevices::defaultVideoInput(), this);
     m_captureSession = new QMediaCaptureSession(this);
     m_imageCapture = new QImageCapture(this);
+    m_videoSink = new QVideoSink(this);
     m_captureSession->setCamera(m_camera);
     m_captureSession->setImageCapture(m_imageCapture);
-    m_captureSession->setVideoOutput(m_viewfinder);
+    m_captureSession->setVideoSink(m_videoSink);
+
+    connect(m_videoSink, &QVideoSink::videoFrameChanged, this,
+            [this](const QVideoFrame &frame) {
+                const QImage image = frame.toImage();
+                if (image.isNull()) return;
+
+                // A selfie preview should behave like a mirror. This affects
+                // only the displayed frame, not the image saved by QImageCapture.
+                const QPixmap mirrored = QPixmap::fromImage(image.flipped(Qt::Horizontal));
+                m_viewfinder->setPixmap(mirrored.scaled(
+                    m_viewfinder->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation
+                ));
+            });
 
     connect(m_imageCapture, &QImageCapture::readyForCaptureChanged, this, [this](bool ready) {
         m_captureButton->setEnabled(ready);
