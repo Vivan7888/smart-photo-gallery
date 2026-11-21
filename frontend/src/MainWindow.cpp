@@ -4,6 +4,7 @@
 #include "Photo.h"
 
 #include <QColor>
+#include <QApplication>
 #include <QDate>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -18,6 +19,7 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <QPushButton>
+#include <QPermissions>
 #include <QStandardPaths>
 #include <QStatusBar>
 #include <QTableWidget>
@@ -245,6 +247,34 @@ int MainWindow::selectedPhotoId() const {
 }
 
 void MainWindow::capturePhoto() {
+    QCameraPermission permission;
+    switch (qApp->checkPermission(permission)) {
+    case Qt::PermissionStatus::Undetermined:
+        qApp->requestPermission(permission, this, [this](const QPermission &result) {
+            if (result.status() == Qt::PermissionStatus::Granted) {
+                capturePhoto();
+            } else {
+                QMessageBox::warning(
+                    this,
+                    "Camera permission required",
+                    "Camera access was not granted. Allow Smart Photo Gallery in "
+                    "System Settings → Privacy & Security → Camera, then try again."
+                );
+            }
+        });
+        return;
+    case Qt::PermissionStatus::Denied:
+        QMessageBox::warning(
+            this,
+            "Camera permission required",
+            "Allow Smart Photo Gallery in System Settings → Privacy & Security → Camera "
+            "to capture photos directly."
+        );
+        return;
+    case Qt::PermissionStatus::Granted:
+        break;
+    }
+
     CameraCaptureDialog cameraDialog(this);
     if (cameraDialog.exec() != QDialog::Accepted) return;
 

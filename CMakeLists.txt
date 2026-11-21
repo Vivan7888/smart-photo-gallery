@@ -50,6 +50,10 @@ target_link_libraries(SmartPhotoGallery PRIVATE
 )
 
 if(APPLE)
+    # Qt's camera permission backend is a specialised static plugin. Import it
+    # explicitly so QCameraPermission can show macOS's permission prompt.
+    find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS QDarwinCameraPermissionPlugin)
+    qt_import_plugins(SmartPhotoGallery INCLUDE Qt${QT_VERSION_MAJOR}::QDarwinCameraPermissionPlugin)
     set_target_properties(SmartPhotoGallery PROPERTIES
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/frontend/resources/Info.plist"
