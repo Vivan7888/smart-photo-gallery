@@ -6,8 +6,8 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets Multimedia MultimediaWidgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Multimedia MultimediaWidgets)
 
 add_library(photo_data_structures
     data-structures/src/photo_ds.c
@@ -25,11 +25,16 @@ target_include_directories(photo_core PUBLIC
     photo-storage/include
     data-structures/include
 )
-target_link_libraries(photo_core PUBLIC photo_data_structures Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(photo_core PUBLIC
+    photo_data_structures
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Multimedia
+)
 
 add_executable(SmartPhotoGallery
     frontend/src/main.cpp
     frontend/src/MainWindow.cpp
+    frontend/src/CameraCaptureDialog.cpp
 )
 target_include_directories(SmartPhotoGallery PRIVATE
     frontend/src
@@ -37,8 +42,16 @@ target_include_directories(SmartPhotoGallery PRIVATE
     photo-storage/include
     data-structures/include
 )
-target_link_libraries(SmartPhotoGallery PRIVATE photo_core Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(SmartPhotoGallery PRIVATE
+    photo_core
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Multimedia
+    Qt${QT_VERSION_MAJOR}::MultimediaWidgets
+)
 
 if(APPLE)
-    set_target_properties(SmartPhotoGallery PROPERTIES MACOSX_BUNDLE TRUE)
+    set_target_properties(SmartPhotoGallery PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/frontend/resources/Info.plist"
+    )
 endif()

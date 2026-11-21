@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 
+#include "CameraCaptureDialog.h"
 #include "Photo.h"
 
 #include <QColor>
@@ -8,8 +9,6 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QFile>
-#include <QFileDialog>
-#include <QFileInfo>
 #include <QFrame>
 #include <QHeaderView>
 #include <QHBoxLayout>
@@ -125,8 +124,8 @@ void MainWindow::buildUi() {
     controlTopRow->addWidget(m_searchInput, 1);
     auto *actionRow = new QHBoxLayout;
     actionRow->setSpacing(9);
-    auto *addButton = new QPushButton("+  Add photos", controlPanel);
-    addButton->setObjectName("primaryButton");
+    auto *captureButton = new QPushButton("Capture photo", controlPanel);
+    captureButton->setObjectName("primaryButton");
     auto *archiveButton = new QPushButton("Archive selected", controlPanel);
     archiveButton->setObjectName("archiveButton");
     auto *archiveOlderButton = new QPushButton("Archive eligible", controlPanel);
@@ -135,13 +134,13 @@ void MainWindow::buildUi() {
     auto *undoButton = new QPushButton("Undo archive", controlPanel);
     auto *deleteButton = new QPushButton("Delete", controlPanel);
     deleteButton->setObjectName("dangerButton");
-    addButton->setToolTip("Import photos into local managed storage");
+    captureButton->setToolTip("Use the MacBook camera and save directly to the gallery");
     archiveButton->setToolTip("Archive the selected photo, regardless of its date");
     archiveOlderButton->setToolTip("Archive every photo that is at least one year old");
     previewButton->setToolTip("Open the selected image; archived files are restored temporarily");
     undoButton->setToolTip("Restore the most recently archived photo");
 
-    actionRow->addWidget(addButton);
+    actionRow->addWidget(captureButton);
     actionRow->addWidget(previewButton);
     actionRow->addWidget(archiveButton);
     actionRow->addWidget(archiveOlderButton);
@@ -175,7 +174,7 @@ void MainWindow::buildUi() {
     setCentralWidget(central);
     statusBar()->showMessage("Ready — your photos stay local.");
 
-    connect(addButton, &QPushButton::clicked, this, [this] { importPhotos(); });
+    connect(captureButton, &QPushButton::clicked, this, [this] { capturePhoto(); });
     connect(previewButton, &QPushButton::clicked, this, [this] { previewSelectedPhoto(); });
     connect(archiveButton, &QPushButton::clicked, this, [this] { archiveSelectedPhoto(); });
     connect(archiveOlderButton, &QPushButton::clicked, this, [this] { archiveOlderPhotos(); });
@@ -245,27 +244,24 @@ int MainWindow::selectedPhotoId() const {
     return m_photoTable->item(row, 0)->data(Qt::UserRole).toInt();
 }
 
-void MainWindow::importPhotos() {
-    // Use Qt's own picker instead of the macOS native picker. This prevents the
-    // native dialog from appearing behind the application on some systems.
-    QFileDialog picker(this, "Choose photos");
-    picker.setFileMode(QFileDialog::ExistingFiles);
-    picker.setNameFilter("Images (*.png *.jpg *.jpeg *.bmp *.gif *.webp *.heic *.HEIC);;All files (*)");
-    picker.setOption(QFileDialog::DontUseNativeDialog, true);
-    if (picker.exec() != QDialog::Accepted) return;
-    const QStringList paths = picker.selectedFiles();
-    if (paths.isEmpty()) return;
+void MainWindow::capturePhoto() {
+    CameraCaptureDialog cameraDialog(this);
+    if (cameraDialog.exec() != QDialog::Accepted) return;
 
-    int imported = 0;
-    QStringList failures;
-    for (const QString &path : paths) {
-        QString error;
-        if (m_repository.importPhoto(path, &error)) ++imported;
-        else failures.append(QFileInfo(path).fileName() + ": " + error);
+    const QString capturedPath = cameraDialog.capturedImagePath();
+    if (capturedPath.isEmpty()) return;
+
+    QString error;
+    PhotoRecord *record = m_repository.importPhoto(capturedPath, &error);
+    QFile::remove(capturedPath);
+
+    if (!record) {
+        QMessageBox::warning(this, "Photo not added", error);
+        return;
     }
+
     refreshTable();
-    statusBar()->showMessage(QString("Imported %1 photo(s).").arg(imported), 5000);
-    if (!failures.isEmpty()) QMessageBox::warning(this, "Some photos were not imported", failures.join("\n"));
+    statusBar()->showMessage("Photo captured and added to your local gallery.", 5000);
 }
 
 void MainWindow::previewSelectedPhoto() {

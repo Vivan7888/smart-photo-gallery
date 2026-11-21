@@ -24,7 +24,7 @@ private:
     void refreshTable();
     void updateSummary();
     int selectedPhotoId() const;
-    void importPhotos();
+    void capturePhoto();
     void previewSelectedPhoto();
     void archiveSelectedPhoto();
     void archiveOlderPhotos();
